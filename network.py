@@ -53,7 +53,7 @@ Y_pred_rf = rf.predict(X_test)
 
 # Accuracy, precision, recall and F1 score
 for y, x in zip([Y_pred, Y_pred_nb, Y_pred_dt, Y_pred_rf],
-             ['LOGISTIC_REGRESSION', 'NAIVE_BAYES', 'DECISION_TREE', 'RANDOM_FOREST']):
+                ['LOGISTIC_REGRESSION', 'NAIVE_BAYES', 'DECISION_TREE', 'RANDOM_FOREST']):
     print(x)
     print("Errors    : %d" % (Y_test != y).sum())
     print("Accuracy  : %.2f%%" % (accuracy_score(y, Y_test) * 100))
