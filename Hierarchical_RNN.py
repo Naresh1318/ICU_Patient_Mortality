@@ -13,7 +13,7 @@ K.set_image_dim_ordering('th')
 
 batch_size = 128
 nb_classes = 2
-nb_epochs = 5
+nb_epochs = 12
 
 # Embedding dimensions.
 row_hidden = 128
