@@ -11,7 +11,7 @@ import numpy as np
 # Hyperparameters
 batch_size = 50
 nb_classes = 2
-nb_epoch = 5
+nb_epoch = 12
 eta = 0.1
 
 # loading the data set
