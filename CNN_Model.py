@@ -21,10 +21,10 @@ X = df.iloc[1:, 1:-2].values
 Y = df.iloc[1:, -1].values
 Y = Y.astype(theano.config.floatX)
 
-# Split train test
+# Split train test, with 90% of data used for training ang 10% for testing
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1)
 
-# Standardization
+# Standardization of data
 sc = StandardScaler()
 sc.fit(X_train)
 X_train_sd = sc.transform(X_train)
@@ -34,9 +34,11 @@ X_test_sd = X_test_sd.astype('float32')
 X_test_sd = np.reshape(X_test_sd, (X_test_sd.shape[0], 1, 33, 22))
 X_train_sd = np.reshape(X_train_sd, (X_train_sd.shape[0], 1, 33, 22))
 
+# Convert the value in the label to a one hot vector
 Y_train = np_utils.to_categorical(Y_train, nb_classes)
 Y_test = np_utils.to_categorical(Y_test, nb_classes)
 
+# Keras CNN Model
 model = Sequential()
 model.add(Convolution2D(64, 3, 3, border_mode='same', input_shape=(1, 33, 22)))
 model.add(Activation('relu'))
@@ -54,7 +56,6 @@ model.add(Activation('softmax'))
 
 model.summary()
 
-
 model.compile(loss='categorical_crossentropy',
               optimizer='adadelta',
               metrics=['accuracy'])
@@ -62,6 +63,8 @@ model.compile(loss='categorical_crossentropy',
 history = model.fit(X_train_sd, Y_train,
                     batch_size=batch_size, nb_epoch=nb_epoch,
                     verbose=1, validation_data=(X_test_sd, Y_test))
+
 score = model.evaluate(X_test_sd, Y_test, verbose=0)
+
 print('Test loss    : %.2f%%' % (score[0] * 100))
 print('Test accuracy : %.2f%%' % (score[1] * 100))

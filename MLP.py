@@ -62,5 +62,6 @@ history = model.fit(X_train, Y_train,
                     verbose=1, validation_data=(X_test, Y_test))
 
 score = model.evaluate(X_test, Y_test, verbose=0)
+
 print('Test loss    : %.2f%%' % (score[0] * 100))
 print('Test accuracy : %.2f%%' % (score[1] * 100))
