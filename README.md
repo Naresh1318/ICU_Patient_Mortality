@@ -7,3 +7,4 @@ ICU patient mortality prediction
  * pandas
  * scikit learn
  
+Still under development, may contain bugs.
