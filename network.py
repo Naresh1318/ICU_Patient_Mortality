@@ -118,7 +118,7 @@ lr_pca.fit(X_train_sd_pca, Y_train)
 
 # Gaussian Process Classifier with PCA
 gpc_pca = KNeighborsClassifier()
-gpc_pca.fit(X_test_sd_pca, Y_train)
+gpc_pca.fit(X_train_sd_pca, Y_train)
 
 print("Models with PCA trained")
 print("Testing...")
