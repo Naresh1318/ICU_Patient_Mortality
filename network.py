@@ -5,6 +5,7 @@ from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import Perceptron, LogisticRegression
 from sklearn.metrics import accuracy_score, recall_score, f1_score, precision_score
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
@@ -57,6 +58,10 @@ rf.fit(X_train, Y_train)
 lr = LogisticRegression()
 lr.fit(X_train_sd, Y_train)
 
+# KNeighborsClassifier
+gpc = KNeighborsClassifier()
+gpc.fit(X_train_sd, Y_train)
+
 print("Models trained")
 print("Predicting...")
 
@@ -75,9 +80,13 @@ Y_pred_rf = rf.predict(X_test)
 # Prediction for Logistic Regression
 Y_pred_lr = lr.predict(X_test_sd)
 
+# Prediction for Gaussian Process Classifier
+Y_pred_gpc = gpc.predict(X_test_sd)
+
 # Accuracy, precision, recall and F1 score
-for y, x in zip([Y_pred_pe, Y_pred_nb, Y_pred_dt, Y_pred_rf, Y_pred_lr],
-                ['PERCEPTRON', 'NAIVE_BAYES', 'DECISION_TREE', 'RANDOM_FOREST', 'LOGISTIC_REGRESSION']):
+for y, x in zip([Y_pred_pe, Y_pred_nb, Y_pred_dt, Y_pred_rf, Y_pred_lr, Y_pred_gpc],
+                ['PERCEPTRON', 'NAIVE_BAYES', 'DECISION_TREE', 'RANDOM_FOREST', 'LOGISTIC_REGRESSION',
+                 'KNeighborsClassifier']):
     print(x)
     print("Errors    : %d" % (Y_test != y).sum())
     print("Accuracy  : %.2f%%" % (accuracy_score(y, Y_test) * 100))
@@ -107,6 +116,10 @@ rf_pca.fit(X_train_pca, Y_train)
 lr_pca = LogisticRegression()
 lr_pca.fit(X_train_sd_pca, Y_train)
 
+# Gaussian Process Classifier with PCA
+gpc_pca = KNeighborsClassifier()
+gpc_pca.fit(X_test_sd_pca, Y_train)
+
 print("Models with PCA trained")
 print("Testing...")
 
@@ -125,10 +138,13 @@ Y_pred_rf_pca = rf_pca.predict(X_test_pca)
 # Prediction for Logistic Regression
 Y_pred_lr_pca = lr_pca.predict(X_test_sd_pca)
 
+# Gaussian Process Classifier
+Y_pred_gpc_pca = gpc_pca.predict(X_test_sd_pca)
+
 # Accuracy, precision, recall and F1 score
-for y, x in zip([Y_pred_pe_pca, Y_pred_nb_pca, Y_pred_dt_pca, Y_pred_rf_pca, Y_pred_lr_pca],
+for y, x in zip([Y_pred_pe_pca, Y_pred_nb_pca, Y_pred_dt_pca, Y_pred_rf_pca, Y_pred_lr_pca, Y_pred_gpc_pca],
                 ['PERCEPTRON PCA', 'NAIVE_BAYES PCA', 'DECISION_TREE PCA',
-                 'RANDOM_FOREST PCA', 'LOGISTIC_REGRESSION PCA']):
+                 'RANDOM_FOREST PCA', 'LOGISTIC_REGRESSION PCA', 'KNeighborsClassifier']):
     print(x)
     print("Errors    : %d" % (Y_test != y).sum())
     print("Accuracy  : %.2f%%" % (accuracy_score(y, Y_test) * 100))
