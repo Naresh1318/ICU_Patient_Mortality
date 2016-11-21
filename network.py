@@ -14,7 +14,7 @@ from sklearn.decomposition import PCA
 print("Loading data...")
 
 # loading the data set
-df = pd.read_csv('LABTESTS_DEATH.csv', header=None)
+df = pd.read_csv('LABTESTS_DEATH_V2.csv', header=None)
 X = df.iloc[1:, 1:-2].values
 Y = df.iloc[1:, -1].values
 Y = Y.astype(np.float)
