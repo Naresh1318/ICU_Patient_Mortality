@@ -8,6 +8,7 @@ from keras.models import Sequential
 from keras.utils import np_utils
 from sklearn.cross_validation import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
 K.set_image_dim_ordering('th')
 
@@ -31,12 +32,17 @@ X_train_sd = sc.transform(X_train)
 X_test_sd = sc.transform(X_test)
 X_train_sd = X_train_sd.astype('float32')
 X_test_sd = X_test_sd.astype('float32')
-X_test_sd = np.reshape(X_test_sd, (X_test_sd.shape[0], 1, 33, 22))
-X_train_sd = np.reshape(X_train_sd, (X_train_sd.shape[0], 1, 33, 22))
+pca = PCA(n_components=100)
+X_train_sd_pca = pca.fit_transform(X_train_sd)
+X_test_sd_pca = pca.transform(X_test_sd)
+X_test_sd_pca = np.reshape(X_test_sd, (X_test_sd_pca.shape[0], 1, 10, 10))
+X_train_sd_pca = np.reshape(X_train_sd, (X_train_sd_pca.shape[0], 1, 10, 10))
 
 # Convert the value in the label to a one hot vector
 Y_train = np_utils.to_categorical(Y_train, nb_classes)
 Y_test = np_utils.to_categorical(Y_test, nb_classes)
+
+
 
 # Keras CNN Model
 model = Sequential()
@@ -60,11 +66,11 @@ model.compile(loss='categorical_crossentropy',
               optimizer='adadelta',
               metrics=['accuracy'])
 
-history = model.fit(X_train_sd, Y_train,
+history = model.fit(X_train_sd_pca, Y_train,
                     batch_size=batch_size, nb_epoch=nb_epoch,
                     verbose=1, validation_data=(X_test_sd, Y_test))
 
-score = model.evaluate(X_test_sd, Y_test, verbose=0)
+score = model.evaluate(X_test_sd_pca, Y_test, verbose=0)
 
 print('Test loss    : %.2f%%' % (score[0] * 100))
 print('Test accuracy : %.2f%%' % (score[1] * 100))
