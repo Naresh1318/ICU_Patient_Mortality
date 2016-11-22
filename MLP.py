@@ -4,11 +4,10 @@ Train a MLP network to predict the mortality of patients in ICU
 
 import pandas as pd
 import theano
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
-from keras.optimizers import SGD
 from keras.utils import np_utils
 
 # Hyperparameters
