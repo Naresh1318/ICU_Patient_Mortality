@@ -12,12 +12,13 @@ from sklearn.decomposition import PCA
 
 K.set_image_dim_ordering('th')
 
+# WITH PCA
 batch_size = 128
 nb_classes = 2
 nb_epoch = 12
 
 # loading the data set
-df = pd.read_csv('LABTESTS_DEATH.csv', header=None)
+df = pd.read_csv('LABTESTS_DEATH_V2.csv', header=None)
 X = df.iloc[1:, 1:-2].values
 Y = df.iloc[1:, -1].values
 Y = Y.astype(theano.config.floatX)
@@ -41,8 +42,6 @@ X_train_sd_pca = np.reshape(X_train_sd, (X_train_sd_pca.shape[0], 1, 10, 10))
 # Convert the value in the label to a one hot vector
 Y_train = np_utils.to_categorical(Y_train, nb_classes)
 Y_test = np_utils.to_categorical(Y_test, nb_classes)
-
-
 
 # Keras CNN Model
 model = Sequential()
