@@ -1,7 +1,7 @@
 from __future__ import print_function
 import numpy as np
 import pandas as pd
-import pydotplus
+import os
 from sklearn.cross_validation import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -10,6 +10,7 @@ from sklearn.metrics import accuracy_score
 
 # Parameters
 top_feat_no = 10
+file_name = 'ICU'
 
 print("Loading data...")
 
@@ -48,14 +49,23 @@ print("Features Selected!!!")
 X_train2, X_test2, Y_train2, Y_test2 = train_test_split(X2, Y2, test_size=0.1, random_state=0)
 
 # Use Decision Tree Classifier to get the graph, which can be used to get the threshold test values
-clf = DecisionTreeClassifier(max_depth=4)
+clf = DecisionTreeClassifier(max_depth=4, criterion='')
 clf.fit(X_train2, Y_train2)
 clf_pred = clf.predict(X_test2)
 
 # Get the accuracy for Decision Tree
 print("%.2f%%" % (accuracy_score(clf_pred, Y_test2) * 100))
 
-# Export the graph
-with open("Lab_Tests.dot", 'w') as f:
-    f = tree.export_graphviz(clf, out_file=f)
+# Get the test ids from the new DataFrame
+test_ids = df.iloc[0, :].values
+test_ids_str = []
+for i in test_ids:
+    test_ids_str.append(str(i))
 
+# Export the graph
+with open("{}.dot".format(file_name), 'w') as f:
+    f = tree.export_graphviz(clf, out_file=f, feature_names=test_ids_str, class_names=['0', '1'],
+                             filled=True, rounded=True, special_characters=True, impurity=True)
+
+# convert the graph from dot to pdf format
+os.system('dot -Tpdf %s.dot -o %s.pdf' % (file_name, file_name))
