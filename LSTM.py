@@ -9,13 +9,13 @@ from keras.utils import np_utils
 import numpy as np
 
 # Hyperparameters
-batch_size = 50
+batch_size = 128
 nb_classes = 2
 nb_epoch = 12
 eta = 0.1
 
 # loading the data set
-df = pd.read_csv('LABTESTS_DEATH.csv', header=None)
+df = pd.read_csv('LABTESTS_DEATH_V2.csv', header=None)
 X = df.iloc[1:, 1:-2].values
 Y = df.iloc[1:, -1].values  # Last column in the Dataframe contains the class label
 Y = Y.astype(theano.config.floatX)  # Convert the datatype to float32 to use the GPU
