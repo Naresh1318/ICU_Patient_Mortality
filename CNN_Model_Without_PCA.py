@@ -13,7 +13,7 @@ K.set_image_dim_ordering('th')
 
 batch_size = 128
 nb_classes = 2
-nb_epoch = 13
+nb_epoch = 12
 
 # loading the data set
 df = pd.read_csv('LABTESTS_DEATH_V2.csv', header=None)
