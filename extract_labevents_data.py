@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import progressbar
 
+"""Tests with more than one value have been considered"""
+
 # Create a progressbar object with the ETA widget
 bar = progressbar.ProgressBar(widgets=[
     ' [', progressbar.Timer(), '] ',
@@ -52,14 +54,15 @@ for sub in bar(Unique_Sub_id):
 
         # Convert the datatype of the elements to int class
         df_sub_item = df_sub_item.astype('int')
-
-        # Find the mean for each ITEMID -> VALUE
-        avg_sub_item = df_sub_item['VALUE'].mean(axis=0)
+        if len(df_sub_item) > 1:
+            # Find the mean for each ITEMID -> VALUE only if more than 1 test is conducted
+            avg_sub_item = df_sub_item['VALUE'].mean(axis=0)
 
         # Create a new DataFrame with appropriate SUBJECT_ID, ITEMID and VALUE values
         temp_df = pd.DataFrame([[sub, item, avg_sub_item]], columns=['SUBJECT_ID', 'ITEMID', 'VALUE'])
         # Append all values for each SUBJECT_ID to temp2_df
         temp2_df = temp2_df.append(temp_df)
+        avg_sub_item = 0
     # Create a new DataFrame for each SUBJECT_ID with the columns as ITEMIDs
     # and each column having the appropriate mean value
     temp3_df = pd.DataFrame([list(temp2_df['VALUE'])], columns=list(temp2_df['ITEMID']))
@@ -76,4 +79,4 @@ final_df = final_df.fillna(0)
 final_df['SUBJET_ID'] = Unique_Sub_id
 
 # Create the csv file
-final_df.to_csv('LABTESTS.csv')
+final_df.to_csv('LABTESTS_V2.csv')
