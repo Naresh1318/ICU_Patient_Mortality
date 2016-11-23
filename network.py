@@ -10,6 +10,17 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.decomposition import PCA
+import progressbar
+
+# Progressbar setup
+bar = progressbar.ProgressBar(widgets=[
+    ' [', progressbar.Timer(), '] ',
+    progressbar.Bar(),
+    ' (', progressbar.ETA(), ') ',
+])
+
+# Parameters
+pca_val = [10, 50, 100, 200, 300, 400, 500, 600]
 
 print("Loading data...")
 
@@ -27,14 +38,6 @@ sc = StandardScaler()
 sc.fit(X_train)
 X_train_sd = sc.transform(X_train)
 X_test_sd = sc.transform(X_test)
-
-# Feature extraction using PCA with number of components as 500
-pca = PCA(n_components=500)
-X_train_sd_pca = pca.fit_transform(X_train_sd)
-X_test_sd_pca = pca.transform(X_test_sd)
-pca1 = PCA(n_components=500)
-X_train_pca = pca1.fit_transform(X_train)
-X_test_pca = pca1.transform(X_test)
 
 print("Data loaded...")
 
@@ -83,6 +86,8 @@ Y_pred_lr = lr.predict(X_test_sd)
 # Prediction for Gaussian Process Classifier
 Y_pred_gpc = gpc.predict(X_test_sd)
 
+print("WITHOUT PCA")
+
 # Accuracy, precision, recall and F1 score
 for y, x in zip([Y_pred_pe, Y_pred_nb, Y_pred_dt, Y_pred_rf, Y_pred_lr, Y_pred_gpc],
                 ['PERCEPTRON', 'NAIVE_BAYES', 'DECISION_TREE', 'RANDOM_FOREST', 'LOGISTIC_REGRESSION',
@@ -96,58 +101,71 @@ for y, x in zip([Y_pred_pe, Y_pred_nb, Y_pred_dt, Y_pred_rf, Y_pred_lr, Y_pred_g
 
 # Fit models using PCA
 print("Applying PCA...")
-# Perceptron Model
-pe_pca = Perceptron(n_iter=10, eta0=10, n_jobs=-1)
-pe_pca.fit(X_train_sd_pca, Y_train)
 
-# Naive Bayes Classification
-nb_pca = GaussianNB()
-nb_pca.fit(X_train_pca, Y_train)
+for n_c in bar(pca_val):
+    # Feature extraction using PCA with number of components as 500
+    pca = PCA(n_components=n_c)
+    X_train_sd_pca = pca.fit_transform(X_train_sd)
+    X_test_sd_pca = pca.transform(X_test_sd)
+    pca1 = PCA(n_components=n_c)
+    X_train_pca = pca1.fit_transform(X_train)
+    X_test_pca = pca1.transform(X_test)
+    # Perceptron Model
+    pe_pca = Perceptron(n_iter=10, eta0=10, n_jobs=-1)
+    pe_pca.fit(X_train_sd_pca, Y_train)
 
-# Decision Tree Classifier
-dt_pca = DecisionTreeClassifier(max_depth=4)
-dt_pca.fit(X_train_pca, Y_train)
+    # Naive Bayes Classification
+    nb_pca = GaussianNB()
+    nb_pca.fit(X_train_pca, Y_train)
 
-# RandomForest Classifier
-rf_pca = RandomForestClassifier(criterion='entropy', n_estimators=10, n_jobs=-1)
-rf_pca.fit(X_train_pca, Y_train)
+    # Decision Tree Classifier
+    dt_pca = DecisionTreeClassifier(max_depth=4)
+    dt_pca.fit(X_train_pca, Y_train)
 
-# Logistic Regression trained with PCA
-lr_pca = LogisticRegression()
-lr_pca.fit(X_train_sd_pca, Y_train)
+    # RandomForest Classifier
+    rf_pca = RandomForestClassifier(criterion='entropy', n_estimators=10, n_jobs=-1)
+    rf_pca.fit(X_train_pca, Y_train)
 
-# Gaussian Process Classifier with PCA
-gpc_pca = KNeighborsClassifier()
-gpc_pca.fit(X_train_sd_pca, Y_train)
+    # Logistic Regression trained with PCA
+    lr_pca = LogisticRegression()
+    lr_pca.fit(X_train_sd_pca, Y_train)
 
-print("Models with PCA trained")
-print("Testing...")
+    # Gaussian Process Classifier with PCA
+    gpc_pca = KNeighborsClassifier()
+    gpc_pca.fit(X_train_sd_pca, Y_train)
 
-# Prediction for Perceptron
-Y_pred_pe_pca = pe_pca.predict(X_test_sd_pca)
+    print("Models with PCA trained")
+    print("Testing...")
 
-# Prediction for Naive Bayes
-Y_pred_nb_pca = nb_pca.predict(X_test_pca)
+    # Prediction for Perceptron
+    Y_pred_pe_pca = pe_pca.predict(X_test_sd_pca)
 
-# Prediction for Decision Tree Classifier
-Y_pred_dt_pca = dt_pca.predict(X_test_pca)
+    # Prediction for Naive Bayes
+    Y_pred_nb_pca = nb_pca.predict(X_test_pca)
 
-# Prediction for RandomForest Classifier
-Y_pred_rf_pca = rf_pca.predict(X_test_pca)
+    # Prediction for Decision Tree Classifier
+    Y_pred_dt_pca = dt_pca.predict(X_test_pca)
 
-# Prediction for Logistic Regression
-Y_pred_lr_pca = lr_pca.predict(X_test_sd_pca)
+    # Prediction for RandomForest Classifier
+    Y_pred_rf_pca = rf_pca.predict(X_test_pca)
 
-# Gaussian Process Classifier
-Y_pred_gpc_pca = gpc_pca.predict(X_test_sd_pca)
+    # Prediction for Logistic Regression
+    Y_pred_lr_pca = lr_pca.predict(X_test_sd_pca)
 
-# Accuracy, precision, recall and F1 score
-for y, x in zip([Y_pred_pe_pca, Y_pred_nb_pca, Y_pred_dt_pca, Y_pred_rf_pca, Y_pred_lr_pca, Y_pred_gpc_pca],
-                ['PERCEPTRON PCA', 'NAIVE_BAYES PCA', 'DECISION_TREE PCA',
-                 'RANDOM_FOREST PCA', 'LOGISTIC_REGRESSION PCA', 'KNeighborsClassifier']):
-    print(x)
-    print("Errors    : %d" % (Y_test != y).sum())
-    print("Accuracy  : %.2f%%" % (accuracy_score(y, Y_test) * 100))
-    print("Precision : %.2f%%" % (precision_score(y, Y_test) * 100))
-    print("Recall    : %.2f%%" % (recall_score(y, Y_test) * 100))
-    print("F1 Score  : %.2f%% \n" % (f1_score(y, Y_test) * 100))
+    # Gaussian Process Classifier
+    Y_pred_gpc_pca = gpc_pca.predict(X_test_sd_pca)
+
+    print("PCA n_components : %d" % n_c)
+
+    # Accuracy, precision, recall and F1 score
+    for y, x in zip([Y_pred_pe_pca, Y_pred_nb_pca, Y_pred_dt_pca, Y_pred_rf_pca, Y_pred_lr_pca, Y_pred_gpc_pca],
+                    ['PERCEPTRON PCA', 'NAIVE_BAYES PCA', 'DECISION_TREE PCA',
+                     'RANDOM_FOREST PCA', 'LOGISTIC_REGRESSION PCA', 'KNeighborsClassifier']):
+        print(x)
+        print("Errors    : %d" % (Y_test != y).sum())
+        print("Accuracy  : %.2f%%" % (accuracy_score(y, Y_test) * 100))
+        print("Precision : %.2f%%" % (precision_score(y, Y_test) * 100))
+        print("Recall    : %.2f%%" % (recall_score(y, Y_test) * 100))
+        print("F1 Score  : %.2f%% \n" % (f1_score(y, Y_test) * 100))
+
+    print("\n")
