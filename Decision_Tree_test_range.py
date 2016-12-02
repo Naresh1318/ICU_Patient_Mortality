@@ -49,7 +49,7 @@ print("Features Selected!!!")
 X_train2, X_test2, Y_train2, Y_test2 = train_test_split(X2, Y2, test_size=0.1, random_state=0)
 
 # Use Decision Tree Classifier to get the graph, which can be used to get the threshold test values
-clf = DecisionTreeClassifier(max_depth=4, criterion='')
+clf = DecisionTreeClassifier(max_depth=4)
 clf.fit(X_train2, Y_train2)
 clf_pred = clf.predict(X_test2)
 
@@ -68,4 +68,4 @@ with open("{}.dot".format(file_name), 'w') as f:
                              filled=True, rounded=True, special_characters=True, impurity=True)
 
 # convert the graph from dot to pdf format
-os.system('dot -Tpdf %s.dot -o %s.pdf' % (file_name, file_name))
+os.system('dot -Tpdf %s.dot -o %s.jpg' % (file_name, file_name))
