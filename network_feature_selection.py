@@ -1,7 +1,9 @@
 from __future__ import print_function
+import progressbar
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import Perceptron, LogisticRegression
 from sklearn.metrics import accuracy_score, recall_score, f1_score, precision_score
@@ -9,7 +11,6 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
-import progressbar
 
 # Progressbar setup
 bar = progressbar.ProgressBar(widgets=[
@@ -20,7 +21,54 @@ bar = progressbar.ProgressBar(widgets=[
 
 # loading the data set
 # Parameters
-top_feat_no = [10, 50, 100, 200, 300, 400, 500, 600]
+top_feat_no = [10, 50, 100, 200, 300, 400, 500, 600, 726]
+# Perceptron
+pe_error = []
+pe_acc = []
+pe_pre = []
+pe_rc = []
+pe_f1 = []
+pe_v = [pe_error, pe_acc, pe_pre, pe_rc, pe_f1]
+
+# Naive Bayes
+nb_error = []
+nb_acc = []
+nb_pre = []
+nb_rc = []
+nb_f1 = []
+nb_v = [nb_error, nb_acc, nb_pre, nb_rc, nb_f1]
+
+# Decision Tree
+dt_error = []
+dt_acc = []
+dt_pre = []
+dt_rc = []
+dt_f1 = []
+dt_v = [dt_error, dt_acc, dt_pre, dt_rc, dt_f1]
+
+# Random Forest
+rf_error = []
+rf_acc = []
+rf_pre = []
+rf_rc = []
+rf_f1 = []
+rf_v = [rf_error, rf_acc, rf_pre, rf_rc, rf_f1]
+
+# Logistic Regression
+lr_error = []
+lr_acc = []
+lr_pre = []
+lr_rc = []
+lr_f1 = []
+lr_v = [lr_error, lr_acc, lr_pre, lr_rc, lr_f1]
+
+# KNN
+kn_error = []
+kn_acc = []
+kn_pre = []
+kn_rc = []
+kn_f1 = []
+kn_v = [kn_error, kn_acc, kn_pre, kn_rc, kn_f1]
 
 print("Loading data...")
 
@@ -136,14 +184,52 @@ for f_s in top_feat_no:
     print("Features selected : {}".format(f_s))
 
     # Accuracy, precision, recall and F1 score
-    for y, x in zip([Y_pred_pe, Y_pred_nb, Y_pred_dt, Y_pred_rf, Y_pred_lr, Y_pred_gpc],
-                    ['PERCEPTRON', 'NAIVE_BAYES', 'DECISION_TREE', 'RANDOM_FOREST', 'LOGISTIC_REGRESSION',
-                     'KNeighborsClassifier']):
+    for y, x, p in zip([Y_pred_pe, Y_pred_nb, Y_pred_dt, Y_pred_rf, Y_pred_lr, Y_pred_gpc],
+                       ['PERCEPTRON', 'NAIVE_BAYES', 'DECISION_TREE', 'RANDOM_FOREST', 'LOGISTIC_REGRESSION',
+                        'KNeighborsClassifier'], [pe_v, nb_v, dt_v, rf_v, lr_v, kn_v]):
         print(x)
-        print("Errors    : %d" % (Y_test2 != y).sum())
-        print("Accuracy  : %.2f%%" % (accuracy_score(y, Y_test2) * 100))
-        print("Precision : %.2f%%" % (precision_score(y, Y_test2) * 100))
-        print("Recall    : %.2f%%" % (recall_score(y, Y_test2) * 100))
-        print("F1 Score  : %.2f%% \n" % (f1_score(y, Y_test2) * 100))
+        error = (Y_test2 != y).sum()
+        p[0].append(error)
+        print("Errors    : %d" % error)
+        acc = accuracy_score(y, Y_test2) * 100
+        p[1].append(acc)
+        print("Accuracy  : %.2f%%" % acc)
+        ps = precision_score(y, Y_test2) * 100
+        p[2].append(ps)
+        print("Precision : %.2f%%" % ps)
+        rs = recall_score(y, Y_test2) * 100
+        p[3].append(rs)
+        print("Recall    : %.2f%%" % rs)
+        f1 = f1_score(y, Y_test2) * 100
+        p[4].append(f1)
+        print("F1 Score  : %.2f%% \n" % f1)
     print("**************************************************")
     print("\n")
+print("\n")
+# Plotting Graphs
+# x-axis : without PCA,
+per_x_axis = [10, 50, 100, 200, 300, 400, 500, 600, 726]
+for p, t in zip([pe_v, nb_v, dt_v, rf_v, lr_v, kn_v], ['PERCEPTRON', 'NAIVE_BAYES', 'DECISION_TREE', 'RANDOM_FOREST',
+                                                       'LOGISTIC_REGRESSION', 'KNeighborsClassifier']):
+
+    plt.subplot(1, 2, 1)
+    plt.plot(per_x_axis, p[1], marker='o', color='blue', label='Accuracy')
+    plt.plot(per_x_axis, p[2], marker='s', color='red', label='Precision')
+    plt.plot(per_x_axis, p[3], marker='x', color='green', label='Recall')
+    plt.plot(per_x_axis, p[4], marker='D', color='black', label='F1 Score')
+    if t != 'NAIVE_BAYES':
+        plt.ylim([80.0, 100.0])
+    else:
+        plt.ylim([10.0, 95.0])
+    plt.title('{} Feature Selection'.format(t))
+    plt.xlabel('Features Selected')
+    plt.ylabel('Scores')
+    plt.legend(loc='lower right')
+
+    plt.subplot(1, 2, 2)
+    plt.plot(per_x_axis, p[0], label='No. of Errors')
+    plt.xlabel('Features Selected')
+    plt.ylabel('Errors')
+    plt.title('Error Plot')
+
+    plt.show()
